@@ -9,6 +9,7 @@
 #if os(macOS)
     
     import Cocoa
+    import RxCocoa
 #if !RX_NO_MODULE
     import RxSwift
 #endif
@@ -30,15 +31,20 @@
         ///
         /// - parameter parentObject: Parent object for delegate proxy.
         public required init(parentObject: AnyObject) {
-            self.textView = castOrFatalError(parentObject)
+            guard let textView = parentObject as? NSTextView else {
+                fatalError("Can't get NSTextView")
+                return
+            }
             super.init(parentObject: parentObject)
         }
         
         // MARK: Delegate methods
         
         public override func controlTextDidChange(_ notification: Notification) {
-            let textView: NSTextView = castOrFatalError(notification.object)
-            let nextValue = textView.stringValue
+            guard let textView = notification.object as? NSTextView else {
+                fatalError("Can't get NSTextView")
+            }
+            let nextValue = textView.string
             self.textSubject.on(.next(nextValue))
         }
         
@@ -46,20 +52,29 @@
         
         /// For more information take a look at `DelegateProxyType`.
         public override class func createProxyForObject(_ object: AnyObject) -> AnyObject {
-            let control: NSTextView = castOrFatalError(object)
+            guard let control = object as? NSTextView else {
+                fatalError("Can't get NSTextView")
+            }
             return control.createRxDelegateProxy()
         }
         
         /// For more information take a look at `DelegateProxyType`.
         public class func currentDelegateFor(_ object: AnyObject) -> AnyObject? {
-            let textView: NSTextView = castOrFatalError(object)
+            guard let textView = object as? NSTextView else {
+                fatalError("Can't get NSTextView")
+            }
             return textView.delegate
         }
         
         /// For more information take a look at `DelegateProxyType`.
         public class func setCurrentDelegate(_ delegate: AnyObject?, toObject object: AnyObject) {
-            let textView: NSTextView = castOrFatalError(object)
-            textView.delegate = castOptionalOrFatalError(delegate)
+            guard let textView = object as? NSTextView else {
+                fatalError("Can't get NSTextView")
+            }
+            guard let textViewDelegate = delegate as? NSTextViewDelegate else {
+                fatalError("Can't get NSTextView")
+            }
+            textView.delegate = textViewDelegate
         }
         
     }
@@ -70,7 +85,7 @@
         ///
         /// - returns: Instance of delegate proxy that wraps `delegate`.
         public func createRxDelegateProxy() -> RxTextViewDelegateProxy {
-            return RxtextViewDelegateProxy(parentObject: self)
+            return RxTextViewDelegateProxy(parentObject: self)
         }
     }
     
@@ -80,19 +95,19 @@
         ///
         /// For more information take a look at `DelegateProxyType` protocol documentation.
         public var delegate: DelegateProxy {
-            return RxtextViewDelegateProxy.proxyForObject(base)
+            return RxTextViewDelegateProxy.proxyForObject(base)
         }
         
         /// Reactive wrapper for `text` property.
         public var text: ControlProperty<String?> {
-            let delegate = RxtextViewDelegateProxy.proxyForObject(base)
+            let delegate = RxTextViewDelegateProxy.proxyForObject(base)
             
             let source = Observable.deferred { [weak textView = self.base] in
-                delegate.textSubject.startWith(textView?.stringValue)
+                delegate.textSubject.startWith(textView?.string)
                 }.takeUntil(deallocated)
             
             let observer = UIBindingObserver(UIElement: base) { (control, value: String?) in
-                control.stringValue = value ?? ""
+                control.string = value ?? ""
             }
             
             return ControlProperty(values: source, valueSink: observer.asObserver())

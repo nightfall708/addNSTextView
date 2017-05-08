@@ -7,19 +7,38 @@
 //
 
 import Cocoa
+import RxSwift
+import RxCocoa
 
 class ViewController: NSViewController {
+    
+    let disposeBag = DisposeBag()
+    
+    let viewModel = ViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
-        }
+        
+        self.viewModel.appState.subscribe({event in
+            print("TEST")
+        }).addDisposableTo(disposeBag)
+        self.viewModel.appState.subscribe({event in
+            print("TEST")
+        }).addDisposableTo(disposeBag)
+        self.viewModel.appState.subscribe({event in
+            print("TEST")
+        }).addDisposableTo(disposeBag)
+        self.viewModel.appState.subscribe({event in
+            print("TEST")
+        }).addDisposableTo(disposeBag)
+        self.viewModel.appState.subscribe({event in
+            print("TEST")
+        }).addDisposableTo(disposeBag)
+        self.viewModel.appState.subscribe({event in
+            print("TEST")
+        }).addDisposableTo(disposeBag)
+        
+        self.viewModel.appInput.value = .Key1
     }
 
 
