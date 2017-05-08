@@ -26,6 +26,7 @@ struct ViewModel {
     
     var appState: Observable<AppState> {
         return self.appInput.asObservable().map({ _ in
+            print("This should only appear once")
             return .State1
         }).share()
     }

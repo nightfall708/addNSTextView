@@ -20,22 +20,13 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         
         self.viewModel.appState.subscribe({event in
-            print("TEST")
+            print("Subscription 1")
         }).addDisposableTo(disposeBag)
         self.viewModel.appState.subscribe({event in
-            print("TEST")
+            print("Subscription 2")
         }).addDisposableTo(disposeBag)
         self.viewModel.appState.subscribe({event in
-            print("TEST")
-        }).addDisposableTo(disposeBag)
-        self.viewModel.appState.subscribe({event in
-            print("TEST")
-        }).addDisposableTo(disposeBag)
-        self.viewModel.appState.subscribe({event in
-            print("TEST")
-        }).addDisposableTo(disposeBag)
-        self.viewModel.appState.subscribe({event in
-            print("TEST")
+            print("Subscription 3")
         }).addDisposableTo(disposeBag)
         
         self.viewModel.appInput.value = .Key1
